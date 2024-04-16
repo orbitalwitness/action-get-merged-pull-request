@@ -9,9 +9,11 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          show-progress: false
 
-      - uses: actions-ecosystem/action-release-label@v1
+      - uses: orbitalwitness/action-release-label@main
         id: release-label
         if: ${{ startsWith(github.event.label.name, 'release/') }}
 

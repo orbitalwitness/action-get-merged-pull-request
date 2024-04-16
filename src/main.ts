@@ -6,7 +6,7 @@ interface PullRequest {
   body: string;
   number: number;
   labels: string[] | null;
-  assignees: string[] | null;
+  assignees: string[] | null | undefined;
 }
 
 async function run(): Promise<void> {
@@ -27,9 +27,9 @@ async function run(): Promise<void> {
     core.setOutput('number', pull.number);
     core.setOutput('labels', pull.labels?.join('\n'));
     core.setOutput('assignees', pull.assignees?.join('\n'));
-  } catch (e) {
-    core.error(e);
-    core.setFailed(e.message);
+  } catch (e: any) {
+    core.error(e as any);
+    core.setFailed(e.message as string);
   }
 }
 
@@ -39,9 +39,9 @@ async function getMergedPullRequest(
   repo: string,
   sha: string
 ): Promise<PullRequest | null> {
-  const client = new github.GitHub(githubToken);
+  const octokit = github.getOctokit(githubToken);
 
-  const resp = await client.pulls.list({
+  const resp = await octokit.rest.pulls.list({
     owner,
     repo,
     sort: 'updated',
@@ -50,17 +50,17 @@ async function getMergedPullRequest(
     per_page: 100
   });
 
-  const pull = resp.data.find(p => p.merge_commit_sha === sha);
+  const pull = resp.data.find((p: any) => p.merge_commit_sha === sha);
   if (!pull) {
     return null;
   }
 
   return {
     title: pull.title,
-    body: pull.body,
+    body: pull.body as string,
     number: pull.number,
-    labels: pull.labels.map(l => l.name),
-    assignees: pull.assignees.map(a => a.login)
+    labels: pull.labels.map((l: any) => l.name),
+    assignees: pull.assignees?.map((a: any) => a.login)
   };
 }
 
