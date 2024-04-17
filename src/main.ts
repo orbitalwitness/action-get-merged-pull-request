@@ -28,7 +28,7 @@ async function run(): Promise<void> {
     core.setOutput('labels', pull.labels?.join('\n'));
     core.setOutput('assignees', pull.assignees?.join('\n'));
   } catch (e: any) {
-    core.error(e as any);
+    core.error(e);
     core.setFailed(e.message as string);
   }
 }
